@@ -1,0 +1,61 @@
+#!/usr/bin/with-contenv bashio
+# shellcheck shell=bash
+# ==============================================================================
+# Home Assistant Add-on: Sharry
+# Runs Sharry
+# ==============================================================================
+
+declare -a conf_props
+
+
+# Set monero wallet address
+bashio::log.notice "Adding in monero wallet config options..."
+conf_props+=(--wallet $(bashio::config 'monero_wallet'))
+
+
+# --- Load USER'S CUSTOM configuration overrides ---
+bashio::log.debug "Loading 'p2pool_conf_overrides'..."
+for var in $(bashio::config 'p2pool_conf_overrides|keys'); do
+    property=$(bashio::config "p2pool_conf_overrides[${var}].property")
+    value=$(bashio::config "p2pool_conf_overrides[${var}].value")
+    if [[ ${property} =~ secret|password ]]; then
+        bashio::log.info "Setting ${property} to ******"
+    else
+        if ! bashio::config.is_empty "p2pool_conf_overrides[${var}].value"; then
+        bashio::log.info "Setting ${property} to ${value}"
+        else
+        bashio::log.info "Setting ${property} to on"
+        fi
+    fi
+    if ! bashio::config.is_empty "p2pool_conf_overrides[${var}].value"; then
+    conf_props+=(--${property} ${value//\"/\\\"})
+    else
+    conf_props+=(--${property})
+    fi
+done
+
+
+# Connect to the p2pool-mini sidechain
+if bashio::config.true 'p2pool_mini_sidechain'; then
+    conf_props+=(--mini)
+    bashio::log.info "Configuration set to connect to the p2pool-mini sidechain"
+fi
+
+
+# Set log level
+case "$(bashio::config 'p2pool_loglevel')" in \
+    0)      loglevel='0' ;; \
+    1)      loglevel='1' ;; \
+    2)      loglevel='2' ;; \
+    3)      loglevel='3' ;; \
+    4)      loglevel='4' ;; \
+    5)      loglevel='5' ;; \
+    6)      loglevel='6' ;; \
+esac;
+conf_props+=(--loglevel $loglevel)
+bashio::log.info "P2pool log level set to $loglevel"
+
+
+# Launching monerod
+bashio::log.info "Starting of P2Pool"
+exec /opt/p2pool "${conf_props[@]}"
