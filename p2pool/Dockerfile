@@ -7,7 +7,7 @@ FROM ${BUILD_FROM}
 # https://github.com/eikek/sharry/releases
 ARG P2POOL_VERSION=2.5
 
-# Add Sharry and java
+# Add p2pool
 RUN set -eux; \
     apt-get update; \
     \
