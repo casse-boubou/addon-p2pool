@@ -14,6 +14,5 @@ configuration:
     description: Verbosity of the log, integer number between 0 and 6
 network:
   3333/tcp: Port open for mining witht external xmrig.
-  18080/tcp: Monero p2p port
   37889/tcp: P2Pool p2p port
   37888/tcp: P2Pool mini p2p port
