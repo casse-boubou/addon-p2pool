@@ -56,6 +56,6 @@ conf_props+=(--loglevel $loglevel)
 bashio::log.info "P2pool log level set to $loglevel"
 
 
-# Launching monerod
+# Launching p2Pool
 bashio::log.info "Starting of P2Pool"
 exec /opt/p2pool "${conf_props[@]}"
