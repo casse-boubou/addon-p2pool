@@ -1,8 +1,8 @@
 #!/usr/bin/with-contenv bashio
 # shellcheck shell=bash
 # ==============================================================================
-# Home Assistant Add-on: Sharry
-# Runs Sharry
+# Home Assistant Add-on: P2pool
+# Runs P2pool
 # ==============================================================================
 
 declare -a conf_props
