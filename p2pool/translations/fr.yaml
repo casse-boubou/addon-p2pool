@@ -9,6 +9,9 @@ configuration:
   p2pool_mini_sidechain:
     name: Ajouter le paramètre --mini
     description: Se connecter à la chaine p2pool-mini.
+  p2pool_print_status:
+    name: P2pool print status (minutes)
+    description: Interval de temps en minutes pour afficher le statut.
   p2pool_loglevel:
     name: P2pool loglevel
     description: Verbosité du journal, nombre entier compris entre 0 et 6.

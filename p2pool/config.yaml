@@ -30,4 +30,5 @@ schema:
       value: str
   monero_wallet: password
   p2pool_mini_sidechain: bool?
+  p2pool_print_status: int(1,)?
   p2pool_loglevel: list(0|1|2|3|4|5|6)?

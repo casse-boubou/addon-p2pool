@@ -1,0 +1,116 @@
+#!/usr/bin/with-contenv bashio
+# shellcheck shell=bash
+# ==============================================================================
+# Home Assistant Add-on: P2pool
+# Runs status_commande
+# ==============================================================================
+
+# --- Declare of variables and functions ---
+
+#   Set variables according to the parameters of sidechain
+if bashio::config.true 'p2pool_mini_sidechain'; then
+    side_chain_ID=mini
+    json_pool_info=https://mini.p2pool.observer/api/pool_info
+    json_shares_windows=https://mini.p2pool.observer/api/shares_in_window/$(bashio::config 'monero_wallet')
+    json_network=https://p2pool.io/mini/api/network/stats
+else
+    side_chain_ID=default
+    json_pool_info=https://p2pool.observer/api/pool_info
+    json_shares_windows=https://p2pool.observer/api/shares_in_window/$(bashio::config 'monero_wallet')
+    json_network=https://p2pool.io/api/network/stats
+fi
+
+#   Set number of second to wait
+if ! bashio::config.is_empty 'p2pool_print_status'; then
+    dodo=$(( $(bashio::config 'p2pool_print_status') * 60 ))
+else
+    dodo=900
+fi
+
+#   Get Json data from URL
+function get_json {
+  curl --silent --show-error $1 -H "Accept: application/json" > $2
+}
+
+#   Convert variable to float
+function to_float {
+  printf %.3f "$((10**$4 * $(jq -r $1 $2) / $3))e-$4"
+}
+
+#   Get number of uncles from JSON
+function calcul_uncles {
+  oncles=0
+  for ChaquesEntree in $(jq -r '.' /tmp/shares_in_windows.json); do
+    if [[ $ChaquesEntree =~ parent ]]; then
+        ((oncles+=1))
+    fi
+  done
+  printf $oncles
+}
+
+
+
+
+# --- Wait for p2pool is running ---
+while ! pidof -q p2pool; do
+    sleep 5
+    bashio::log.error "P2POOL IS NOT RUNNING YET"
+done
+
+
+
+# --- Save p2pool PID ---
+pidof p2pool > /tmp/p2pool.pid
+
+PID=$(</tmp/p2pool.pid)
+
+sleep 5
+
+
+
+# --- Wait for p2pool sync ---
+while (($(jq -r '.pool.hashrate' /tmp/stats_mod) < 2000000)); do
+    bashio::log.error "Wait for p2pool sync"
+    sleep 5
+done
+bashio::log.info "P2pool is now sync with $side_chain_ID SideChain."
+
+
+
+# --- Execute commande status command ---
+while pidof -q p2pool; do
+    pidof p2pool > /tmp/p2pool.pid
+    PID=$(</tmp/p2pool.pid)
+    # --- SideChain status ---
+    get_json $json_pool_info /tmp/pool_info.json
+    get_json $json_shares_windows /tmp/shares_in_windows.json
+    get_json $json_network /tmp/network_stats.json
+    bashio::log.warning "SideChain status"
+    bashio::log.notice "Main chain height               = $(jq -r '.mainchain.height' /tmp/pool_info.json)"
+    bashio::log.notice "Main chain hashrate             = $(to_float '.difficulty' /tmp/network_stats.json $(($(jq -r '.mainchain.block_time' /tmp/pool_info.json) * 1000000000)) 6) GH/s"
+    bashio::log.notice "Side chain ID                   = $side_chain_ID"
+    bashio::log.notice "Side chain height               = $(jq -r '.sidechain.height' /tmp/pool_info.json)"
+    bashio::log.notice "Side chain hashrate             = $(to_float '.pool.hashrate' /tmp/stats_mod 1000000 6) MH/s"
+    bashio::log.notice "PPLNS window                    = $(jq -r '.sidechain.window.blocks' /tmp/pool_info.json) blocks (+$(jq -r '.sidechain.window.uncles' /tmp/pool_info.json) uncles)"
+    bashio::log.notice "Shares in current PPNLS windows = $(( $(jq -r '. | length' /tmp/shares_in_windows.json) - $(calcul_uncles) )) blocks (+$(calcul_uncles) uncles)"
+    # --- StratumServer status ---
+    cpt=0
+    while ((cpt<7200)); do    
+        bashio::log.warning "StratumServer status"
+        if test -f "/tmp/local/stats"; then
+            bashio::log.info "Hashrate (15m est) = $(to_float '.hashrate_15m' /tmp/local/stats 1000 3) KH/s"
+            bashio::log.info "Hashrate (1h est)  = $(to_float '.hashrate_1h' /tmp/local/stats 1000 3) KH/s"
+            bashio::log.info "Hashrate (24h est) = $(to_float '.hashrate_24h' /tmp/local/stats 1000 3) KH/s"
+            bashio::log.info "Total hashes       = $(jq -r '.total_hashes' /tmp/local/stats)"
+            bashio::log.info "Shares found       = $(jq -r '.shares_found' /tmp/local/stats)"
+            bashio::log.info "Average effort     = $(jq -r '.average_effort' /tmp/local/stats)%"
+            bashio::log.info "Current effort     = $(jq -r '.current_effort' /tmp/local/stats)%"
+            bashio::log.info "Connections        = $(jq -r '.connections' /tmp/local/stats) ($(jq -r '.incoming_connections' /tmp/local/stats) incoming)"
+            rm /tmp/local/stats
+        else
+            bashio::log.warning "No active miner connexion"
+        fi
+        sleep $dodo
+        ((cpt+=$dodo))
+    done
+done
