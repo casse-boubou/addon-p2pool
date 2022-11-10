@@ -109,6 +109,14 @@ while pidof -q p2pool; do
             rm /tmp/local/stats
         else
             bashio::log.warning "No active miner connexion"
+            bashio::log.info "Hashrate (15m est) = 0 KH/s"
+            bashio::log.info "Hashrate (1h est)  = 0 KH/s"
+            bashio::log.info "Hashrate (24h est) = 0 KH/s"
+            bashio::log.info "Total hashes       = 0"
+            bashio::log.info "Shares found       = 0"
+            bashio::log.info "Average effort     = 0.000%"
+            bashio::log.info "Current effort     = 0.000%"
+            bashio::log.info "Connections        = 0 (0 incoming)"
         fi
         sleep $dodo
         ((cpt+=$dodo))
