@@ -10,7 +10,7 @@ configuration:
     name: Add the --mini parameter
     description: Connect to p2pool-mini sidechain.
   p2pool_loglevel:
-    name: P2pool_loglevel
+    name: P2pool loglevel
     description: Verbosity of the log, integer number between 0 and 6
 network:
   3333/tcp: Port open for mining witht external xmrig.
