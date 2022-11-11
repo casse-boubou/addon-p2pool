@@ -85,38 +85,38 @@ while pidof -q p2pool; do
     get_json $json_pool_info /tmp/pool_info.json
     get_json $json_shares_windows /tmp/shares_in_windows.json
     get_json $json_network /tmp/network_stats.json
-    bashio::log.warning "SideChain status"
-    bashio::log.notice "Main chain height               = $(jq -r '.mainchain.height' /tmp/pool_info.json)"
-    bashio::log.notice "Main chain hashrate             = $(to_float '.difficulty' /tmp/network_stats.json $(($(jq -r '.mainchain.block_time' /tmp/pool_info.json) * 1000000000)) 6) GH/s"
-    bashio::log.notice "Side chain ID                   = $side_chain_ID"
-    bashio::log.notice "Side chain height               = $(jq -r '.sidechain.height' /tmp/pool_info.json)"
-    bashio::log.notice "Side chain hashrate             = $(to_float '.pool.hashrate' /tmp/stats_mod 1000000 6) MH/s"
-    bashio::log.notice "PPLNS window                    = $(jq -r '.sidechain.window.blocks' /tmp/pool_info.json) blocks (+$(jq -r '.sidechain.window.uncles' /tmp/pool_info.json) uncles)"
-    bashio::log.notice "Shares in current PPNLS windows = $(( $(jq -r '. | length' /tmp/shares_in_windows.json) - $(calcul_uncles) )) blocks (+$(calcul_uncles) uncles)"
+    bashio::log.notice "SideChain status"
+    echo "Main chain height               = $(jq -r '.mainchain.height' /tmp/pool_info.json)"
+    echo "Main chain hashrate             = $(to_float '.difficulty' /tmp/network_stats.json $(($(jq -r '.mainchain.block_time' /tmp/pool_info.json) * 1000000000)) 6) GH/s"
+    echo "Side chain ID                   = $side_chain_ID"
+    echo "Side chain height               = $(jq -r '.sidechain.height' /tmp/pool_info.json)"
+    echo "Side chain hashrate             = $(to_float '.pool.hashrate' /tmp/stats_mod 1000000 6) MH/s"
+    echo "PPLNS window                    = $(jq -r '.sidechain.window.blocks' /tmp/pool_info.json) blocks (+$(jq -r '.sidechain.window.uncles' /tmp/pool_info.json) uncles)"
+    echo "Shares in current PPNLS windows = $(( $(jq -r '. | length' /tmp/shares_in_windows.json) - $(calcul_uncles) )) blocks (+$(calcul_uncles) uncles)"
     # --- StratumServer status ---
     cpt=0
     while ((cpt<7200)); do    
-        bashio::log.warning "StratumServer status"
+        bashio::log.info "StratumServer status"
         if test -f "/tmp/local/stats"; then
-            bashio::log.info "Hashrate (15m est) = $(to_float '.hashrate_15m' /tmp/local/stats 1000 3) KH/s"
-            bashio::log.info "Hashrate (1h est)  = $(to_float '.hashrate_1h' /tmp/local/stats 1000 3) KH/s"
-            bashio::log.info "Hashrate (24h est) = $(to_float '.hashrate_24h' /tmp/local/stats 1000 3) KH/s"
-            bashio::log.info "Total hashes       = $(jq -r '.total_hashes' /tmp/local/stats)"
-            bashio::log.info "Shares found       = $(jq -r '.shares_found' /tmp/local/stats)"
-            bashio::log.info "Average effort     = $(jq -r '.average_effort' /tmp/local/stats)%"
-            bashio::log.info "Current effort     = $(jq -r '.current_effort' /tmp/local/stats)%"
-            bashio::log.info "Connections        = $(jq -r '.connections' /tmp/local/stats) ($(jq -r '.incoming_connections' /tmp/local/stats) incoming)"
+            echo "Hashrate (15m est) = $(to_float '.hashrate_15m' /tmp/local/stats 1000 3) KH/s"
+            echo "Hashrate (1h est)  = $(to_float '.hashrate_1h' /tmp/local/stats 1000 3) KH/s"
+            echo "Hashrate (24h est) = $(to_float '.hashrate_24h' /tmp/local/stats 1000 3) KH/s"
+            echo "Total hashes       = $(jq -r '.total_hashes' /tmp/local/stats)"
+            echo "Shares found       = $(jq -r '.shares_found' /tmp/local/stats)"
+            echo "Average effort     = $(jq -r '.average_effort' /tmp/local/stats)%"
+            echo "Current effort     = $(jq -r '.current_effort' /tmp/local/stats)%"
+            echo "Connections        = $(jq -r '.connections' /tmp/local/stats) ($(jq -r '.incoming_connections' /tmp/local/stats) incoming)"
             rm /tmp/local/stats
         else
-            bashio::log.warning "No active miner connexion"
-            bashio::log.info "Hashrate (15m est) = 0 KH/s"
-            bashio::log.info "Hashrate (1h est)  = 0 KH/s"
-            bashio::log.info "Hashrate (24h est) = 0 KH/s"
-            bashio::log.info "Total hashes       = 0"
-            bashio::log.info "Shares found       = 0"
-            bashio::log.info "Average effort     = 0.000%"
-            bashio::log.info "Current effort     = 0.000%"
-            bashio::log.info "Connections        = 0 (0 incoming)"
+            echo "No active miner connexion"
+            echo "Hashrate (15m est) = 0 KH/s"
+            echo "Hashrate (1h est)  = 0 KH/s"
+            echo "Hashrate (24h est) = 0 KH/s"
+            echo "Total hashes       = 0"
+            echo "Shares found       = 0"
+            echo "Average effort     = 0.000%"
+            echo "Current effort     = 0.000%"
+            echo "Connections        = 0 (0 incoming)"
         fi
         sleep $dodo
         ((cpt+=$dodo))
