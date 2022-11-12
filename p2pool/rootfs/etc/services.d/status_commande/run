@@ -38,16 +38,32 @@ function to_float {
 }
 
 #   Get number of uncles from JSON
-function calcul_uncles {
-  oncles=0
-  for ChaquesEntree in $(jq -c '.' /tmp/shares_in_windows.json); do
+function calcul_uncles_sidechain {
+  oncles_side=0
+  for ChaquesEntree in $(jq -c '.' /tmp/get_json/shares_in_windows.json); do
     if [[ $ChaquesEntree =~ parent ]]; then
-        ((oncles+=1))
+        ((oncles_side+=1))
     fi
   done
-  printf $oncles
+  printf $oncles_side
 }
 
+mkdir /tmp/variables
+echo 0 > /tmp/variables/oncles.txt
+function calcul_uncles_stratum {
+  oncles_stratum=$(</tmp/variables/oncles.txt)
+  touch /tmp/variables/timestamp.json
+  for ChaquesEntree in $(jq -c '.[]' /tmp/get_json/shares_in_windows.json); do
+    if [[ $ChaquesEntree =~ parent ]]; then
+      echo $ChaquesEntree > /tmp/variables/timestamp.json
+      if [[ $(( $(date +%s) - $dodo )) -le $(jq '. | .timestamp' /tmp/variables/timestamp.json) ]]; then
+        ((oncles_stratum+=1))
+      fi
+    fi
+  done
+  echo $oncles_stratum > /tmp/variables/oncles.txt
+  printf $oncles_stratum
+}
 
 
 
@@ -82,17 +98,18 @@ while pidof -q p2pool; do
     pidof p2pool > /tmp/p2pool.pid
     PID=$(</tmp/p2pool.pid)
     # --- SideChain status ---
-    get_json $json_pool_info /tmp/pool_info.json
-    get_json $json_shares_windows /tmp/shares_in_windows.json
-    get_json $json_network /tmp/network_stats.json
+    mkdir /tmp/get_json
+    get_json $json_pool_info /tmp/get_json/pool_info.json
+    get_json $json_shares_windows /tmp/get_json/shares_in_windows.json
+    get_json $json_network /tmp/get_json/network_stats.json
     bashio::log.notice "SideChain status"
-    echo "Main chain height               = $(jq '.mainchain.height' /tmp/pool_info.json)"
-    echo "Main chain hashrate             = $(to_float '.difficulty' /tmp/network_stats.json $(($(jq '.mainchain.block_time' /tmp/pool_info.json) * 1000000000)) 6) GH/s"
+    echo "Main chain height               = $(jq '.mainchain.height' /tmp/get_json/pool_info.json)"
+    echo "Main chain hashrate             = $(to_float '.difficulty' /tmp/get_json/network_stats.json $(($(jq '.mainchain.block_time' /tmp/get_json/pool_info.json) * 1000000000)) 6) GH/s"
     echo "Side chain ID                   = $side_chain_ID"
-    echo "Side chain height               = $(jq '.sidechain.height' /tmp/pool_info.json)"
+    echo "Side chain height               = $(jq '.sidechain.height' /tmp/get_json/pool_info.json)"
     echo "Side chain hashrate             = $(to_float '.pool.hashrate' /tmp/stats_mod 1000000 6) MH/s"
-    echo "PPLNS window                    = $(jq '.sidechain.window.blocks' /tmp/pool_info.json) blocks (+$(jq '.sidechain.window.uncles' /tmp/pool_info.json) uncles)"
-    echo "Shares in current PPNLS windows = $(( $(jq '. | length' /tmp/shares_in_windows.json) - $(calcul_uncles) )) blocks (+$(calcul_uncles) uncles)"
+    echo "PPLNS window                    = $(jq '.sidechain.window.blocks' /tmp/get_json/pool_info.json) blocks (+$(jq '.sidechain.window.uncles' /tmp/get_json/pool_info.json) uncles)"
+    echo "Shares in current PPNLS windows = $(( $(jq '. | length' /tmp/get_json/shares_in_windows.json) - $(calcul_uncles_sidechain) )) blocks (+$(calcul_uncles_sidechain) uncles)"
     # --- StratumServer status ---
     cpt=0
     while ((cpt<7200)); do    
@@ -102,7 +119,8 @@ while pidof -q p2pool; do
             echo "Hashrate (1h est)  = $(to_float '.hashrate_1h' /tmp/local/stats 1000 3) KH/s"
             echo "Hashrate (24h est) = $(to_float '.hashrate_24h' /tmp/local/stats 1000 3) KH/s"
             echo "Total hashes       = $(jq '.total_hashes' /tmp/local/stats)"
-            echo "Shares found       = $(jq '.shares_found' /tmp/local/stats)"
+            calcul_uncles_stratum
+            echo "Shares found       = $(( $(jq '.shares_found' /tmp/local/stats) - $(</tmp/variables/oncles.txt) )) (+$(</tmp/variables/oncles.txt) uncles)"
             echo "Average effort     = $(jq '.average_effort' /tmp/local/stats)%"
             echo "Current effort     = $(jq '.current_effort' /tmp/local/stats)%"
             echo "Connections        = $(jq '.connections' /tmp/local/stats) ($(jq '.incoming_connections' /tmp/local/stats) incoming)"
