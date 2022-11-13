@@ -66,6 +66,13 @@ function calcul_uncles_stratum {
   echo $oncles_stratum > /tmp/variables/oncles.txt
 }
 
+#   Get uptime
+staring_time=$(date +%s)
+function calcul_time {
+  starting_from=$(( $(date +%s) - $staring_time ))
+  printf $(date -d@$starting_from -u +%H:%M:%S)
+}
+
 
 
 # --- Wait for p2pool is running ---
@@ -117,6 +124,7 @@ while pidof -q p2pool; do
     cpt=0
     while ((cpt<7200)); do
         bashio::log.info "StratumServer status"
+        echo "P2PServer Uptime $(calcul_time)"
         if test -f "/tmp/local/stats"; then
             echo "Hashrate (15m est) = $(to_float '.hashrate_15m' /tmp/local/stats 1000 3) KH/s"
             echo "Hashrate (1h est)  = $(to_float '.hashrate_1h' /tmp/local/stats 1000 3) KH/s"
