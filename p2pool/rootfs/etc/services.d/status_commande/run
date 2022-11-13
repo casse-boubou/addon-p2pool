@@ -13,11 +13,13 @@ if bashio::config.true 'p2pool_mini_sidechain'; then
     json_pool_info=https://mini.p2pool.observer/api/pool_info
     json_shares_windows=https://mini.p2pool.observer/api/shares_in_window/$(bashio::config 'monero_wallet')
     json_network=https://p2pool.io/mini/api/network/stats
+    miner_info=https://mini.p2pool.observer/api/miner_info/$(bashio::config 'monero_wallet')
 else
     side_chain_ID=default
     json_pool_info=https://p2pool.observer/api/pool_info
     json_shares_windows=https://p2pool.observer/api/shares_in_window/$(bashio::config 'monero_wallet')
     json_network=https://p2pool.io/api/network/stats
+    miner_info=https://p2pool.observer/api/miner_info/$(bashio::config 'monero_wallet')
 fi
 
 #   Set number of second to wait
@@ -62,7 +64,6 @@ function calcul_uncles_stratum {
     fi
   done
   echo $oncles_stratum > /tmp/variables/oncles.txt
-  printf $oncles_stratum
 }
 
 
@@ -94,11 +95,11 @@ bashio::log.info "P2pool is now sync with $side_chain_ID SideChain."
 
 
 # --- Execute commande status command ---
+mkdir /tmp/get_json
 while pidof -q p2pool; do
     pidof p2pool > /tmp/p2pool.pid
     PID=$(</tmp/p2pool.pid)
     # --- SideChain status ---
-    mkdir /tmp/get_json
     get_json $json_pool_info /tmp/get_json/pool_info.json
     get_json $json_shares_windows /tmp/get_json/shares_in_windows.json
     get_json $json_network /tmp/get_json/network_stats.json
@@ -111,8 +112,10 @@ while pidof -q p2pool; do
     echo "PPLNS window                    = $(jq '.sidechain.window.blocks' /tmp/get_json/pool_info.json) blocks (+$(jq '.sidechain.window.uncles' /tmp/get_json/pool_info.json) uncles)"
     echo "Shares in current PPNLS windows = $(( $(jq '. | length' /tmp/get_json/shares_in_windows.json) - $(calcul_uncles_sidechain) )) blocks (+$(calcul_uncles_sidechain) uncles)"
     # --- StratumServer status ---
+    get_json $miner_info /tmp/get_json/miner_info.json
+    echo $(jq '.shares.blocks' /tmp/get_json/miner_info.json) > /tmp/variables/shares_found.txt
     cpt=0
-    while ((cpt<7200)); do    
+    while ((cpt<7200)); do
         bashio::log.info "StratumServer status"
         if test -f "/tmp/local/stats"; then
             echo "Hashrate (15m est) = $(to_float '.hashrate_15m' /tmp/local/stats 1000 3) KH/s"
@@ -125,6 +128,17 @@ while pidof -q p2pool; do
             echo "Current effort     = $(jq '.current_effort' /tmp/local/stats)%"
             echo "Connections        = $(jq '.connections' /tmp/local/stats) ($(jq '.incoming_connections' /tmp/local/stats) incoming)"
             rm /tmp/local/stats
+            loop=0
+            while ((loop<$dodo)); do
+                get_json $miner_info /tmp/get_json/miner_info.json
+                if [[ $(jq '.shares.blocks' /tmp/get_json/miner_info.json) -gt $(</tmp/variables/shares_found.txt) ]] ; then
+                    nb_shares_found=$(( $(jq '.shares.blocks' /tmp/get_json/miner_info.json) - $(</tmp/variables/shares_found.txt) ))
+                    bashio::log.info "CONGRATULATIONS $nb_shares_found NEW SHARE(S) FOUND"
+                    echo $(jq '.shares.blocks' /tmp/get_json/miner_info.json) > /tmp/variables/shares_found.txt
+                fi
+                sleep 60
+                ((loop+=60))
+            done
         else
             echo "No active miner connexion"
             echo "Hashrate (15m est) = 0 KH/s"
@@ -135,8 +149,18 @@ while pidof -q p2pool; do
             echo "Average effort     = 0.000%"
             echo "Current effort     = 0.000%"
             echo "Connections        = 0 (0 incoming)"
+            loop=0
+            while ((loop<$dodo)); do
+                get_json $miner_info /tmp/get_json/miner_info.json
+                if [[ $(jq '.shares.blocks' /tmp/get_json/miner_info.json) -gt $(</tmp/variables/shares_found.txt) ]] ; then
+                    nb_shares_found=$(( $(jq '.shares.blocks' /tmp/get_json/miner_info.json) - $(</tmp/variables/shares_found.txt) ))
+                    bashio::log.info "CONGRATULATIONS $nb_shares_found NEW SHARE(S) FOUND"
+                    echo $(jq '.shares.blocks' /tmp/get_json/miner_info.json) > /tmp/variables/shares_found.txt
+                fi
+                sleep 60
+                ((loop+=60)) 
+            done
         fi
-        sleep $dodo
         ((cpt+=$dodo))
     done
 done
