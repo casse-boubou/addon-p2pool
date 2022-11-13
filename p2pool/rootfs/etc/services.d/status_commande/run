@@ -9,69 +9,71 @@
 
 #   Set variables according to the parameters of sidechain
 if bashio::config.true 'p2pool_mini_sidechain'; then
-    side_chain_ID=mini
-    json_pool_info=https://mini.p2pool.observer/api/pool_info
-    json_shares_windows=https://mini.p2pool.observer/api/shares_in_window/$(bashio::config 'monero_wallet')
-    json_network=https://p2pool.io/mini/api/network/stats
-    miner_info=https://mini.p2pool.observer/api/miner_info/$(bashio::config 'monero_wallet')
+    SIDE_CHAIN_ID=mini
+    JSON_POOL_INFO=https://mini.p2pool.observer/api/pool_info
+    JSON_SHARES_WINDOWS=https://mini.p2pool.observer/api/shares_in_window/$(bashio::config 'monero_wallet')
+    JSON_NETWORK=https://p2pool.io/mini/api/network/stats
+    MINER_INFO=https://mini.p2pool.observer/api/miner_info/$(bashio::config 'monero_wallet')
 else
-    side_chain_ID=default
-    json_pool_info=https://p2pool.observer/api/pool_info
-    json_shares_windows=https://p2pool.observer/api/shares_in_window/$(bashio::config 'monero_wallet')
-    json_network=https://p2pool.io/api/network/stats
-    miner_info=https://p2pool.observer/api/miner_info/$(bashio::config 'monero_wallet')
+    SIDE_CHAIN_ID=default
+    JSON_POOL_INFO=https://p2pool.observer/api/pool_info
+    JSON_SHARES_WINDOWS=https://p2pool.observer/api/shares_in_window/$(bashio::config 'monero_wallet')
+    JSON_NETWORK=https://p2pool.io/api/network/stats
+    MINER_INFO=https://p2pool.observer/api/miner_info/$(bashio::config 'monero_wallet')
 fi
 
 #   Set number of second to wait
 if ! bashio::config.is_empty 'p2pool_print_status'; then
-    dodo=$(( $(bashio::config 'p2pool_print_status') * 60 ))
+    DODO=$(( $(bashio::config 'p2pool_print_status') * 60 ))
 else
-    dodo=900
+    DODO=900
 fi
 
 #   Get Json data from URL
-function get_json {
+function GET_JSON {
   curl --silent --show-error $1 -H "Accept: application/json" > $2
 }
 
 #   Convert variable to float
-function to_float {
+function TO_FLOAT {
   printf %.3f "$((10**$4 * $(jq $1 $2) / $3))e-$4"
 }
 
 #   Get number of uncles from JSON
-function calcul_uncles_sidechain {
-  oncles_side=0
+function CALCUL_UNCLES_SIDECHAIN {
+  ONCLES_SIDE=0
   for ChaquesEntree in $(jq -c '.' /tmp/get_json/shares_in_windows.json); do
     if [[ $ChaquesEntree =~ parent ]]; then
-        ((oncles_side+=1))
+        ((ONCLES_SIDE+=1))
     fi
   done
-  printf $oncles_side
+  printf $ONCLES_SIDE
 }
 
 mkdir /tmp/variables
 echo 0 > /tmp/variables/oncles.txt
-function calcul_uncles_stratum {
-  oncles_stratum=$(</tmp/variables/oncles.txt)
+function CALCUL_UNCLES_STRATUM {
+  ONCLES_STRATUM=$(</tmp/variables/oncles.txt)
   touch /tmp/variables/timestamp.json
   for ChaquesEntree in $(jq -c '.[]' /tmp/get_json/shares_in_windows.json); do
     if [[ $ChaquesEntree =~ parent ]]; then
       echo $ChaquesEntree > /tmp/variables/timestamp.json
-      if [[ $(( $(date +%s) - $dodo )) -le $(jq '. | .timestamp' /tmp/variables/timestamp.json) ]]; then
-        ((oncles_stratum+=1))
+      if [[ $(( $(date +%s) - $DODO )) -le $(jq '. | .timestamp' /tmp/variables/timestamp.json) ]]; then
+        ((ONCLES_STRATUM+=1))
       fi
     fi
   done
-  echo $oncles_stratum > /tmp/variables/oncles.txt
+  echo $ONCLES_STRATUM > /tmp/variables/oncles.txt
 }
 
 #   Get uptime
-staring_time=$(date +%s)
-function calcul_time {
-  starting_from=$(( $(date +%s) - $staring_time ))
-  printf $(date -d@$starting_from -u +%H:%M:%S)
+STARTING_TIME=$(date +%s)
+function CALCUL_TIME {
+  STARTING_FROM=$(( $(date +%s) - $STARTING_TIME ))
+  printf $(date -d@$STARTING_FROM -u +%H:%M:%S)
 }
+
+
 
 
 
@@ -82,7 +84,6 @@ while ! pidof -q p2pool; do
 done
 
 
-
 # --- Save p2pool PID ---
 pidof p2pool > /tmp/p2pool.pid
 
@@ -91,14 +92,12 @@ PID=$(</tmp/p2pool.pid)
 sleep 5
 
 
-
 # --- Wait for p2pool sync ---
 while (($(jq '.pool.hashrate' /tmp/stats_mod) < 2000000)); do
     bashio::log.error "Wait for p2pool sync"
     sleep 5
 done
-bashio::log.info "P2pool is now sync with $side_chain_ID SideChain."
-
+bashio::log.info "P2pool is now sync with $SIDE_CHAIN_ID SideChain."
 
 
 # --- Execute commande status command ---
@@ -107,45 +106,45 @@ while pidof -q p2pool; do
     pidof p2pool > /tmp/p2pool.pid
     PID=$(</tmp/p2pool.pid)
     # --- SideChain status ---
-    get_json $json_pool_info /tmp/get_json/pool_info.json
-    get_json $json_shares_windows /tmp/get_json/shares_in_windows.json
-    get_json $json_network /tmp/get_json/network_stats.json
+    GET_JSON $JSON_POOL_INFO /tmp/get_json/pool_info.json
+    GET_JSON $JSON_SHARES_WINDOWS /tmp/get_json/shares_in_windows.json
+    GET_JSON $JSON_NETWORK /tmp/get_json/network_stats.json
     bashio::log.notice "SideChain status"
     echo "Main chain height               = $(jq '.mainchain.height' /tmp/get_json/pool_info.json)"
-    echo "Main chain hashrate             = $(to_float '.difficulty' /tmp/get_json/network_stats.json $(($(jq '.mainchain.block_time' /tmp/get_json/pool_info.json) * 1000000000)) 6) GH/s"
-    echo "Side chain ID                   = $side_chain_ID"
+    echo "Main chain hashrate             = $(TO_FLOAT '.difficulty' /tmp/get_json/network_stats.json $(($(jq '.mainchain.block_time' /tmp/get_json/pool_info.json) * 1000000000)) 6) GH/s"
+    echo "Side chain ID                   = $SIDE_CHAIN_ID"
     echo "Side chain height               = $(jq '.sidechain.height' /tmp/get_json/pool_info.json)"
-    echo "Side chain hashrate             = $(to_float '.pool.hashrate' /tmp/stats_mod 1000000 6) MH/s"
+    echo "Side chain hashrate             = $(TO_FLOAT '.pool.hashrate' /tmp/stats_mod 1000000 6) MH/s"
     echo "PPLNS window                    = $(jq '.sidechain.window.blocks' /tmp/get_json/pool_info.json) blocks (+$(jq '.sidechain.window.uncles' /tmp/get_json/pool_info.json) uncles)"
-    echo "Shares in current PPNLS windows = $(( $(jq '. | length' /tmp/get_json/shares_in_windows.json) - $(calcul_uncles_sidechain) )) blocks (+$(calcul_uncles_sidechain) uncles)"
+    echo "Shares in current PPNLS windows = $(( $(jq '. | length' /tmp/get_json/shares_in_windows.json) - $(CALCUL_UNCLES_SIDECHAIN) )) blocks (+$(CALCUL_UNCLES_SIDECHAIN) uncles)"
     # --- StratumServer status ---
-    get_json $miner_info /tmp/get_json/miner_info.json
+    GET_JSON $MINER_INFO /tmp/get_json/miner_info.json
     echo $(jq '.shares.blocks' /tmp/get_json/miner_info.json) > /tmp/variables/shares_found.txt
-    cpt=0
-    while ((cpt<7200)); do
+    CPT=0
+    while ((CPT<7200)); do
         bashio::log.info "StratumServer status"
-        echo "P2PServer Uptime $(calcul_time)"
+        echo "P2PServer Uptime $(CALCUL_TIME)"
         if test -f "/tmp/local/stats"; then
-            echo "Hashrate (15m est) = $(to_float '.hashrate_15m' /tmp/local/stats 1000 3) KH/s"
-            echo "Hashrate (1h est)  = $(to_float '.hashrate_1h' /tmp/local/stats 1000 3) KH/s"
-            echo "Hashrate (24h est) = $(to_float '.hashrate_24h' /tmp/local/stats 1000 3) KH/s"
+            echo "Hashrate (15m est) = $(TO_FLOAT '.hashrate_15m' /tmp/local/stats 1000 3) KH/s"
+            echo "Hashrate (1h est)  = $(TO_FLOAT '.hashrate_1h' /tmp/local/stats 1000 3) KH/s"
+            echo "Hashrate (24h est) = $(TO_FLOAT '.hashrate_24h' /tmp/local/stats 1000 3) KH/s"
             echo "Total hashes       = $(jq '.total_hashes' /tmp/local/stats)"
-            calcul_uncles_stratum
+            CALCUL_UNCLES_STRATUM
             echo "Shares found       = $(( $(jq '.shares_found' /tmp/local/stats) - $(</tmp/variables/oncles.txt) )) (+$(</tmp/variables/oncles.txt) uncles)"
             echo "Average effort     = $(jq '.average_effort' /tmp/local/stats)%"
             echo "Current effort     = $(jq '.current_effort' /tmp/local/stats)%"
             echo "Connections        = $(jq '.connections' /tmp/local/stats) ($(jq '.incoming_connections' /tmp/local/stats) incoming)"
             rm /tmp/local/stats
-            loop=0
-            while ((loop<$dodo)); do
-                get_json $miner_info /tmp/get_json/miner_info.json
+            LOOP=0
+            while ((LOOP<$DODO)); do
+                GET_JSON $MINER_INFO /tmp/get_json/miner_info.json
                 if [[ $(jq '.shares.blocks' /tmp/get_json/miner_info.json) -gt $(</tmp/variables/shares_found.txt) ]] ; then
-                    nb_shares_found=$(( $(jq '.shares.blocks' /tmp/get_json/miner_info.json) - $(</tmp/variables/shares_found.txt) ))
-                    bashio::log.info "CONGRATULATIONS $nb_shares_found NEW SHARE(S) FOUND"
+                    NB_SHARES_FOUND=$(( $(jq '.shares.blocks' /tmp/get_json/miner_info.json) - $(</tmp/variables/shares_found.txt) ))
+                    bashio::log.info "CONGRATULATIONS $NB_SHARES_FOUND NEW SHARE(S) FOUND"
                     echo $(jq '.shares.blocks' /tmp/get_json/miner_info.json) > /tmp/variables/shares_found.txt
                 fi
                 sleep 60
-                ((loop+=60))
+                ((LOOP+=60))
             done
         else
             echo "No active miner connexion"
@@ -157,18 +156,18 @@ while pidof -q p2pool; do
             echo "Average effort     = 0.000%"
             echo "Current effort     = 0.000%"
             echo "Connections        = 0 (0 incoming)"
-            loop=0
-            while ((loop<$dodo)); do
-                get_json $miner_info /tmp/get_json/miner_info.json
+            LOOP=0
+            while ((LOOP<$DODO)); do
+                GET_JSON $MINER_INFO /tmp/get_json/miner_info.json
                 if [[ $(jq '.shares.blocks' /tmp/get_json/miner_info.json) -gt $(</tmp/variables/shares_found.txt) ]] ; then
-                    nb_shares_found=$(( $(jq '.shares.blocks' /tmp/get_json/miner_info.json) - $(</tmp/variables/shares_found.txt) ))
-                    bashio::log.info "CONGRATULATIONS $nb_shares_found NEW SHARE(S) FOUND"
+                    NB_SHARES_FOUND=$(( $(jq '.shares.blocks' /tmp/get_json/miner_info.json) - $(</tmp/variables/shares_found.txt) ))
+                    bashio::log.info "CONGRATULATIONS $NB_SHARES_FOUND NEW SHARE(S) FOUND"
                     echo $(jq '.shares.blocks' /tmp/get_json/miner_info.json) > /tmp/variables/shares_found.txt
                 fi
                 sleep 60
-                ((loop+=60)) 
+                ((LOOP+=60)) 
             done
         fi
-        ((cpt+=$dodo))
+        ((CPT+=$DODO))
     done
 done
