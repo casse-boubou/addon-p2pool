@@ -109,7 +109,7 @@ while pidof -q p2pool; do
     GET_JSON $JSON_POOL_INFO /tmp/get_json/pool_info.json
     GET_JSON $JSON_SHARES_WINDOWS /tmp/get_json/shares_in_windows.json
     GET_JSON $JSON_NETWORK /tmp/get_json/network_stats.json
-    bashio::log.notice "SideChain status"
+    bashio::log.blue "SideChain status"
     echo "Main chain height               = $(jq '.mainchain.height' /tmp/get_json/pool_info.json)"
     echo "Main chain hashrate             = $(TO_FLOAT '.difficulty' /tmp/get_json/network_stats.json $(($(jq '.mainchain.block_time' /tmp/get_json/pool_info.json) * 1000000000)) 6) GH/s"
     echo "Side chain ID                   = $SIDE_CHAIN_ID"
@@ -122,8 +122,8 @@ while pidof -q p2pool; do
     echo $(jq '.shares.blocks' /tmp/get_json/miner_info.json) > /tmp/variables/shares_found.txt
     CPT=0
     while ((CPT<7200)); do
-        bashio::log.info "StratumServer status"
-        echo "P2PServer Uptime $(CALCUL_TIME)"
+        bashio::log.cyan "StratumServer status"
+        bashio::log.info "P2PServer Uptime $(CALCUL_TIME)"
         if test -f "/tmp/local/stats"; then
             echo "Hashrate (15m est) = $(TO_FLOAT '.hashrate_15m' /tmp/local/stats 1000 3) KH/s"
             echo "Hashrate (1h est)  = $(TO_FLOAT '.hashrate_1h' /tmp/local/stats 1000 3) KH/s"
