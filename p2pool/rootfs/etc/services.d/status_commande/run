@@ -131,6 +131,7 @@ while pidof -q p2pool; do
             echo "Total hashes       = $(jq '.total_hashes' /tmp/local/stats)"
             CALCUL_UNCLES_STRATUM
             echo "Shares found       = $(( $(jq '.shares_found' /tmp/local/stats) - $(</tmp/variables/oncles.txt) )) (+$(</tmp/variables/oncles.txt) uncles)"
+            echo "Shares failed      = $(jq '.shares_failed' /tmp/local/stats)"
             echo "Average effort     = $(jq '.average_effort' /tmp/local/stats)%"
             echo "Current effort     = $(jq '.current_effort' /tmp/local/stats)%"
             echo "Connections        = $(jq '.connections' /tmp/local/stats) ($(jq '.incoming_connections' /tmp/local/stats) incoming)"
@@ -153,6 +154,7 @@ while pidof -q p2pool; do
             echo "Hashrate (24h est) = 0 KH/s"
             echo "Total hashes       = 0"
             echo "Shares found       = 0"
+            echo "Shares failed      = 0"
             echo "Average effort     = 0.000%"
             echo "Current effort     = 0.000%"
             echo "Connections        = 0 (0 incoming)"
