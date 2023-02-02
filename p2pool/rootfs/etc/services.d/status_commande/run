@@ -73,6 +73,15 @@ function CALCUL_TIME {
   printf $(date -d@$STARTING_FROM -u +%H:%M:%S)
 }
 
+#   Get PPLNS window duration
+function CALCUL_PPLNS_WINDOW_DURATION {
+  PPLNSWINDOWDURATION=$(( $(jq '.pool_statistic.pplnsWeight' /tmp/pool/stats) / $(jq '.pool.hashrate' /tmp/stats_mod) ))
+  PPLNSWINDOWDURATIONH=$(date -d@$PPLNSWINDOWDURATION -u +%H)
+  PPLNSWINDOWDURATIONM=$(date -d@$PPLNSWINDOWDURATION -u +%M)
+  PPLNSWINDOWDURATIONS=$(date -d@$PPLNSWINDOWDURATION -u +%S)
+  printf ""$PPLNSWINDOWDURATIONH"h "$PPLNSWINDOWDURATIONM"m "$PPLNSWINDOWDURATIONS"s"
+}
+
 
 
 
@@ -116,6 +125,7 @@ while pidof -q p2pool; do
     echo "Side chain height               = $(jq '.sidechain.height' /tmp/get_json/pool_info.json)"
     echo "Side chain hashrate             = $(TO_FLOAT '.pool.hashrate' /tmp/stats_mod 1000000 6) MH/s"
     echo "PPLNS window                    = $(jq '.sidechain.window.blocks' /tmp/get_json/pool_info.json) blocks (+$(jq '.sidechain.window.uncles' /tmp/get_json/pool_info.json) uncles)"
+    echo "PPLNS window duration           = $(CALCUL_PPLNS_WINDOW_DURATION)"
     echo "Shares in current PPNLS windows = $(( $(jq '. | length' /tmp/get_json/shares_in_windows.json) - $(CALCUL_UNCLES_SIDECHAIN) )) blocks (+$(CALCUL_UNCLES_SIDECHAIN) uncles)"
     # --- StratumServer status ---
     GET_JSON $MINER_INFO /tmp/get_json/miner_info.json
