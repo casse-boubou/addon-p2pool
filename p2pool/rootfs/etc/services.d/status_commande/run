@@ -75,7 +75,7 @@ function CALCUL_TIME {
 
 #   Get PPLNS window duration
 function CALCUL_PPLNS_WINDOW_DURATION {
-  PPLNSWINDOWDURATION=$(( $(jq '.pool_statistic.pplnsWeight' /tmp/pool/stats) / $(jq '.pool.hashrate' /tmp/stats_mod) ))
+  PPLNSWINDOWDURATION=$(( $(jq '.pool_statistics.pplnsWeight' /tmp/pool/stats) / $(jq '.pool.hashrate' /tmp/stats_mod) ))
   PPLNSWINDOWDURATIONH=$(date -d@$PPLNSWINDOWDURATION -u +%H)
   PPLNSWINDOWDURATIONM=$(date -d@$PPLNSWINDOWDURATION -u +%M)
   PPLNSWINDOWDURATIONS=$(date -d@$PPLNSWINDOWDURATION -u +%S)
