@@ -1,11 +1,11 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/debian-base
+ARG BUILD_FROM=ghcr.io/hassio-addons/debian-base:6.2.1
 
 # https://github.com/hassio-addons/addon-base/releases
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
 # https://github.com/eikek/sharry/releases
-ARG P2POOL_VERSION=3.1
+ARG P2POOL_VERSION=v3.1
 
 # Add p2pool
 RUN set -eux; \
@@ -13,11 +13,11 @@ RUN set -eux; \
     \
     mkdir -p /opt; \
     curl -s -J -L -o /tmp/p2pool.tar.gz \
-        "https://github.com/SChernykh/p2pool/releases/download/v${P2POOL_VERSION}/p2pool-v${P2POOL_VERSION}-linux-aarch64.tar.gz"; \
+        "https://github.com/SChernykh/p2pool/releases/download/${P2POOL_VERSION}/p2pool-${P2POOL_VERSION}-linux-aarch64.tar.gz"; \
     tar -xzf /tmp/p2pool.tar.gz -C /tmp; \
-    mv /tmp/p2pool-v${P2POOL_VERSION}-linux-aarch64/p2pool /opt/p2pool; \
+    mv /tmp/p2pool-${P2POOL_VERSION}-linux-aarch64/p2pool /opt/p2pool; \
     rm /tmp/p2pool.tar.gz; \
-    rm -r /tmp/p2pool-v${P2POOL_VERSION}-linux-aarch64
+    rm -r /tmp/p2pool-${P2POOL_VERSION}-linux-aarch64
     
 COPY --chmod=445 rootfs /
 WORKDIR /

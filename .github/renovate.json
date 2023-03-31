@@ -1,0 +1,42 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>erdnaxela02/ha-addon-workflows//.github/renovate.json"],
+  "regexManagers": [
+    {
+      "fileMatch": ["/build.yaml$"],
+      "matchStringsStrategy": "any",
+      "matchStrings": [
+        "(aarch64|amd64|armhf|armv7|i386):\\s[\"']?(?<depName>.*?):(?<currentValue>.*?)[\"']?\\s"
+      ],
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["/Dockerfile$"],
+      "matchStringsStrategy": "any",
+      "matchStrings": [
+        "ARG BUILD_FROM=(?<depName>.*?):(?<currentValue>.*?)\\s+"
+      ],
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["/Dockerfile$"],
+      "matchStrings": ["ARG P2POOL_VERSION=(?<currentValue>.+?)\\s+"],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "SChernykh/p2pool",
+      "versioningTemplate": "loose"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "commitMessagePrefix": "⬆️",
+      "commitMessageTopic": "Addon Base Image"
+    },
+    {
+      "matchDatasources": ["github-tags"],
+      "matchDepNames": ["SChernykh/p2pool"],
+      "commitMessagePrefix": "✨",
+      "commitMessageTopic": "P2Pool"
+    }
+  ]
+}
