@@ -117,10 +117,10 @@ while pidof -q p2pool; do
     # --- SideChain status ---
     GET_JSON $JSON_POOL_INFO /tmp/get_json/pool_info.json
     GET_JSON $JSON_SHARES_WINDOWS /tmp/get_json/shares_in_windows.json
-    GET_JSON $JSON_NETWORK /tmp/get_json/network_stats.json
+    # GET_JSON $JSON_NETWORK /tmp/get_json/network_stats.json
     bashio::log.blue "SideChain status"
     echo "Main chain height               = $(jq '.mainchain.height' /tmp/get_json/pool_info.json)"
-    echo "Main chain hashrate             = $(TO_FLOAT '.difficulty' /tmp/get_json/network_stats.json $(($(jq '.mainchain.block_time' /tmp/get_json/pool_info.json) * 1000000000)) 6) GH/s"
+    echo "Main chain hashrate             = $(TO_FLOAT '.difficulty' /tmp/network/stats $(($(jq '.mainchain.block_time' /tmp/get_json/pool_info.json) * 1000000000)) 6) GH/s"
     echo "Side chain ID                   = $SIDE_CHAIN_ID"
     echo "Side chain height               = $(jq '.sidechain.height' /tmp/get_json/pool_info.json)"
     echo "Side chain hashrate             = $(TO_FLOAT '.pool.hashrate' /tmp/stats_mod 1000000 6) MH/s"
@@ -134,18 +134,18 @@ while pidof -q p2pool; do
     while ((CPT<7200)); do
         bashio::log.cyan "StratumServer status"
         bashio::log.info "P2PServer Uptime $(CALCUL_TIME)"
-        if test -f "/tmp/local/stats"; then
-            echo "Hashrate (15m est) = $(TO_FLOAT '.hashrate_15m' /tmp/local/stats 1000 3) KH/s"
-            echo "Hashrate (1h est)  = $(TO_FLOAT '.hashrate_1h' /tmp/local/stats 1000 3) KH/s"
-            echo "Hashrate (24h est) = $(TO_FLOAT '.hashrate_24h' /tmp/local/stats 1000 3) KH/s"
-            echo "Total hashes       = $(jq '.total_hashes' /tmp/local/stats)"
+        if test -f "/tmp/local/stratum"; then
+            echo "Hashrate (15m est) = $(TO_FLOAT '.hashrate_15m' /tmp/local/stratum 1000 3) KH/s"
+            echo "Hashrate (1h est)  = $(TO_FLOAT '.hashrate_1h' /tmp/local/stratum 1000 3) KH/s"
+            echo "Hashrate (24h est) = $(TO_FLOAT '.hashrate_24h' /tmp/local/stratum 1000 3) KH/s"
+            echo "Total hashes       = $(jq '.total_hashes' /tmp/local/stratum)"
             CALCUL_UNCLES_STRATUM
-            echo "Shares found       = $(( $(jq '.shares_found' /tmp/local/stats) - $(</tmp/variables/oncles.txt) )) (+$(</tmp/variables/oncles.txt) uncles)"
-            echo "Shares failed      = $(jq '.shares_failed' /tmp/local/stats)"
-            echo "Average effort     = $(jq '.average_effort' /tmp/local/stats)%"
-            echo "Current effort     = $(jq '.current_effort' /tmp/local/stats)%"
-            echo "Connections        = $(jq '.connections' /tmp/local/stats) ($(jq '.incoming_connections' /tmp/local/stats) incoming)"
-            rm /tmp/local/stats
+            echo "Shares found       = $(( $(jq '.shares_found' /tmp/local/stratum) - $(</tmp/variables/oncles.txt) )) (+$(</tmp/variables/oncles.txt) uncles)"
+            echo "Shares failed      = $(jq '.shares_failed' /tmp/local/stratum)"
+            echo "Average effort     = $(jq '.average_effort' /tmp/local/stratum)%"
+            echo "Current effort     = $(jq '.current_effort' /tmp/local/stratum)%"
+            echo "Connections        = $(jq '.connections' /tmp/local/stratum) ($(jq '.incoming_connections' /tmp/local/stratum) incoming)"
+            rm /tmp/local/stratum
             LOOP=0
             while ((LOOP<$DODO)); do
                 GET_JSON $MINER_INFO /tmp/get_json/miner_info.json
