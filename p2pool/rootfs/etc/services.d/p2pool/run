@@ -42,6 +42,24 @@ if bashio::config.true 'p2pool_mini_sidechain'; then
 fi
 
 
+# Allow UPnP port forwarding
+if bashio::config.true 'p2pool_UPnP_port_forwarding'; then
+    bashio::log.info "Configuration set to allow UPnP port forwarding"
+else 
+    conf_props+=(--no-upnp)
+    bashio::log.info "Configuration set to not allow UPnP port forwarding"
+fi
+
+
+# Allow UPnP stratum port forwarding
+if bashio::config.true 'p2pool_UPnP_portstratum_forwarding'; then
+    conf_props+=(--upnp-stratum)
+    bashio::log.info "Configuration set to allow UPnPstratum port forwarding"
+else 
+    bashio::log.info "Configuration set to not allow UPnPstratum port forwarding"
+fi
+
+
 # Set log level
 case "$(bashio::config 'p2pool_loglevel')" in \
     0)      loglevel='0' ;; \
