@@ -3,11 +3,7 @@ name: CI
 
 # yamllint disable-line rule:truthy
 on:
-  schedule:
-    - cron: "0 4 * * *"
   push:
-    branches:
-      - main
   pull_request:
     types:
       - opened

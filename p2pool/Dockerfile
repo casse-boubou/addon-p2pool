@@ -8,7 +8,7 @@ FROM ${BUILD_FROM}
 ARG P2POOL_VERSION=v3.1
 
 # Add p2pool
-RUN set -eux; \
+RUN set -eux \
     apt-get update; \
     \
     mkdir -p /opt; \
