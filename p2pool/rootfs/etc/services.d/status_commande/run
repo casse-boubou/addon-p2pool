@@ -48,7 +48,7 @@ function CALCUL_UNCLES_SIDECHAIN {
   for ChaquesEntree in $(jq -c '.[]' /tmp/get_json/side_blocks_in_windows.json); do
     if [[ $ChaquesEntree =~ 0000000000000000000000000000000000000000000000000000000000000000 ]]; then
         ((ONCLES_SIDE+=0))
-        else ((ONCLES_SIDE+=1))
+    else ((ONCLES_SIDE+=1))
     fi
   done
   printf $ONCLES_SIDE
@@ -124,6 +124,11 @@ while pidof -q p2pool; do
     echo "PPLNS window                    = $(jq '.sidechain.window.blocks' /tmp/get_json/pool_info.json) blocks (+$(jq '.sidechain.window.uncles' /tmp/get_json/pool_info.json) uncles)"
     echo "PPLNS window duration           = $(CALCUL_PPLNS_WINDOW_DURATION)"
     echo "Your Shares                     = $(( $(jq '. | length' /tmp/get_json/side_blocks_in_windows.json) - $(CALCUL_UNCLES_SIDECHAIN) )) blocks (+$(CALCUL_UNCLES_SIDECHAIN) uncles)"
+    if test -f "/tmp/local/stratum"; then
+        echo "Block reward share              = $(jq '.block_reward_share_percent' /tmp/local/stratum) %"
+    else
+        echo "Block reward share              = 0.000 %"
+    fi
     # --- StratumServer status ---
     GET_JSON $MINER_INFO /tmp/get_json/miner_info.json
     echo $(jq '.shares[1].shares' /tmp/get_json/miner_info.json) > /tmp/variables/shares_found.txt
