@@ -60,6 +60,7 @@ function CALCUL_UNCLES_STRATUM {
   GET_JSON $MINER_INFO /tmp/get_json/miner_info.json
   if [[ $(jq '.shares[1].uncles' /tmp/get_json/miner_info.json) -gt $(</tmp/variables/oncles.txt) ]] ; then
       NB_UNCLES_FOUND=$(( $(jq '.shares[1].uncles' /tmp/get_json/miner_info.json) - $(</tmp/variables/oncles.txt) ))
+  else NB_UNCLES_FOUND=0
   fi
   printf $NB_UNCLES_FOUND
 }
