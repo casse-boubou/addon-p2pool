@@ -133,7 +133,7 @@ Si vous avez une question concernant HA et ses add-ons vous pouvez consulter:
 
 MIT License
 
-Copyright (c) 2023 [Frosch][frosch]
+Copyright (c) 2023 [Frosh][Frosh]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -175,7 +175,7 @@ SOFTWARE.
 [discord-ha]: https://discord.gg/c5DvZ4e
 [forum]: https://community.home-assistant.io
 [hacf]: https://forum.hacf.fr/
-[frosch]: https://github.com/erdnaxela02
+[Frosh]: https://github.com/erdnaxela02
 [releases]: https://github.com/erdnaxela02/addon-p2pool/releases
 [p2pool]: https://github.com/SChernykh/p2pool
 [p2poolauthor]: https://github.com/SChernykh
