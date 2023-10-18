@@ -29,6 +29,7 @@ p2pool_conf_overrides:
     value: ""
   - property: no-randomx
     value: ""
+host: 127.0.0.1
 monero_wallet: YOUR_WALLET_ADDRESS
 p2pool_mini_sidechain: true
 p2pool_loglevel: "1"
@@ -63,6 +64,10 @@ OR
 **Note**: _Toutes les options n'ont pas été testées. La modification de ces options
 peut éventuellement entraîner des problèmes avec votre instance.
 À UTILISER À VOS RISQUES ET PÉRILS!_
+
+### Option: `host` (required)
+
+Adresse IP de votre noeud Monero. La valeure par défaut est 127.0.0.1.
 
 ### Option: `monero_wallet` (required)
 

@@ -12,6 +12,10 @@ declare -a conf_props
 bashio::log.notice "Adding in monero wallet config options..."
 conf_props+=(--wallet $(bashio::config 'monero_wallet'))
 
+# Set IP address of your Monero node 
+bashio::log.notice "Adding the Monero node address: $(bashio::config 'host')"
+conf_props+=(--host $(bashio::config 'host'))
+
 
 # --- Load USER'S CUSTOM configuration overrides ---
 bashio::log.debug "Loading 'p2pool_conf_overrides'..."
