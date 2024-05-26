@@ -80,8 +80,10 @@ bashio::log.info "P2pool log level set to $loglevel"
 
 # Create folder for data
 mkdir -p \
-    /config/data_api
+    /config/data_api \
+    /config/p2pool_files
 
 # Launching p2pool
 bashio::log.info "Starting of P2Pool"
+cd /config/p2pool_files
 exec /opt/p2pool --data-api /config/data_api --local-api "${conf_props[@]}"
