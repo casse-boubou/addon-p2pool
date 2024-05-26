@@ -24,7 +24,7 @@ done
 
 
 # --- Wait for p2pool sync ---
-while (($(jq '.pool.hashrate' /tmp/stats_mod) < 2000000)); do
+while (($(jq '.pool.hashrate' /config/data_api/stats_mod) < 2000000)); do
     bashio::log.error "Wait for p2pool sync"
     sleep 5
 done
