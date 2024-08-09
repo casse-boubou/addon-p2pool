@@ -44,7 +44,7 @@ LABEL \
     org.opencontainers.image.vendor="Frosh Home Assistant Add-ons" \
     org.opencontainers.image.authors="Frosh" \
     org.opencontainers.image.licenses="MIT" \
-    org.opencontainers.image.url="https://github.com/erdnaxela02/hassio-addons" \
+    org.opencontainers.image.url="https://github.com/casse-boubou/hassio-addons" \
     org.opencontainers.image.source="https://github.com/${BUILD_REPOSITORY}" \
     org.opencontainers.image.documentation="https://github.com/${BUILD_REPOSITORY}/blob/main/README.md" \
     org.opencontainers.image.created=${BUILD_DATE} \

@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>erdnaxela02/ha-addon-workflows//.github/renovate.json"],
+  "extends": ["github>casse-boubou/ha-addon-workflows//.github/renovate.json"],
   "regexManagers": [
     {
       "fileMatch": ["/build.yaml$"],

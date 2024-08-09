@@ -84,18 +84,18 @@ SOFTWARE.
 
 [add-addon]: https://my.home-assistant.io/redirect/supervisor_addon/?addon=c751e21a_p2pool
 [add-addon-shield]: https://my.home-assistant.io/badges/supervisor_addon.svg
-[add-repo]: https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A//github.com/erdnaxela02/hassio-addons
+[add-repo]: https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A//github.com/casse-boubou/hassio-addons
 [add-repo-shield]: https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg
-[releases]: https://github.com/erdnaxela02/addon-p2pool/releases
-[releases-shield]: https://img.shields.io/github/v/release/erdnaxela02/addon-p2pool
-[license-shield]: https://img.shields.io/github/license/erdnaxela02/addon-p2pool
+[releases]: https://github.com/casse-boubou/addon-p2pool/releases
+[releases-shield]: https://img.shields.io/github/v/release/casse-boubou/addon-p2pool
+[license-shield]: https://img.shields.io/github/license/casse-boubou/addon-p2pool
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [p2pool]: https://github.com/SChernykh/p2pool
-[monerod]: https://github.com/erdnaxela02/addon-monerod
+[monerod]: https://github.com/casse-boubou/addon-monerod
 [moneronode]: https://sethforprivacy.com/guides/run-a-monero-node-advanced/
 [discord-ha]: https://discord.gg/c5DvZ4e
 [forum]: https://community.home-assistant.io
 [hacf]: https://forum.hacf.fr/
-[Frosh]: https://github.com/erdnaxela02
+[Frosh]: https://github.com/casse-boubou
 [p2poolauthor]: https://github.com/SChernykh
 [p2poollicense]: https://github.com/SChernykh/p2pool/blob/master/LICENSE
