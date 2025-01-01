@@ -86,4 +86,4 @@ mkdir -p \
 # Launching p2pool
 bashio::log.info "Starting of P2Pool"
 cd /config/p2pool_files
-exec /opt/p2pool --data-api /config/data_api --local-api "${conf_props[@]}"
+exec /opt/p2pool --data-api /config/data_api --local-api --data-dir /config/p2pool_files "${conf_props[@]}"
