@@ -5,7 +5,7 @@ ARG BUILD_FROM=ghcr.io/hassio-addons/debian-base:7.7.1
 FROM ${BUILD_FROM}
 
 # https://github.com/eikek/sharry/releases
-ARG P2POOL_VERSION=v4.3
+ARG P2POOL_VERSION=v4.4
 
 # Add p2pool
 RUN set -eux \
