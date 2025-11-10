@@ -6,7 +6,6 @@ slug: p2pool
 arch:
   - aarch64
 description: P2pool pour HomeAssistant
-codenotary: erdnaxela02@hotmail.fr
 init: false
 auth_api: true
 ports:
