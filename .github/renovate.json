@@ -1,9 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>casse-boubou/ha-addon-workflows//.github/renovate.json"],
-  "regexManagers": [
+  "extends": [
+    "github>casse-boubou/ha-addon-workflows//.github/renovate.json"
+  ],
+  "customManagers": [
     {
-      "fileMatch": ["/build.yaml$"],
+      "customType": "regex",
+      "managerFilePatterns": [
+        "//build.yaml$/"
+      ],
       "matchStringsStrategy": "any",
       "matchStrings": [
         "(aarch64|amd64|armhf|armv7|i386):\\s[\"']?(?<depName>.*?):(?<currentValue>.*?)[\"']?\\s"
@@ -11,7 +16,10 @@
       "datasourceTemplate": "docker"
     },
     {
-      "fileMatch": ["/Dockerfile$"],
+      "customType": "regex",
+      "managerFilePatterns": [
+        "//Dockerfile$/"
+      ],
       "matchStringsStrategy": "any",
       "matchStrings": [
         "ARG BUILD_FROM=(?<depName>.*?):(?<currentValue>.*?)\\s+"
@@ -19,8 +27,13 @@
       "datasourceTemplate": "docker"
     },
     {
-      "fileMatch": ["/Dockerfile$"],
-      "matchStrings": ["ARG P2POOL_VERSION=(?<currentValue>.+?)\\s+"],
+      "customType": "regex",
+      "managerFilePatterns": [
+        "//Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG P2POOL_VERSION=(?<currentValue>.+?)\\s+"
+      ],
       "datasourceTemplate": "github-tags",
       "depNameTemplate": "SChernykh/p2pool",
       "versioningTemplate": "loose"
@@ -28,13 +41,19 @@
   ],
   "packageRules": [
     {
-      "matchDatasources": ["docker"],
+      "matchDatasources": [
+        "docker"
+      ],
       "commitMessagePrefix": "⬆️",
       "commitMessageTopic": "Addon Base Image"
     },
     {
-      "matchDatasources": ["github-tags"],
-      "matchDepNames": ["SChernykh/p2pool"],
+      "matchDatasources": [
+        "github-tags"
+      ],
+      "matchDepNames": [
+        "SChernykh/p2pool"
+      ],
       "commitMessagePrefix": "✨",
       "commitMessageTopic": "P2Pool"
     }
