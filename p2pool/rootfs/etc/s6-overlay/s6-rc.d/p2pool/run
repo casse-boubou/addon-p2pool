@@ -1,7 +1,7 @@
 #!/command/with-contenv bashio
 # shellcheck shell=bash
 # ==============================================================================
-# Home Assistant Add-on: P2pool
+# Home Assistant App: P2pool
 # Runs P2pool
 # ==============================================================================
 
