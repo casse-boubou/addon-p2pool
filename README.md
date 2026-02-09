@@ -1,4 +1,4 @@
-# Home Assistant Add-on: P2pool
+# Home Assistant App: P2pool
 
 [![GitHub Release][releases-shield]][releases]
 [![License][license-shield]](LICENSE)
@@ -10,15 +10,15 @@
 Les pages d'états et de surveillance du pool sont disponible sur <https://p2pool.io>,
 <https://p2pool.observer> ou <https://p2pool.io/mini>, <https://mini.p2pool.observer>
 
-[![Open your Home Assistant instance and show the add add-on repository dialog
+[![Open your Home Assistant instance and show the add app repository dialog
 with a specific repository URL pre-filled.][add-repo-shield]][add-repo]
-[![Open your Home Assistant instance and show the dashboard of a Supervisor add-on.][add-addon-shield]][add-addon]
+[![Open your Home Assistant instance and show the dashboard of a Supervisor app.][add-app-shield]][add-app]
 
 ## About
 
 - Pour miner sur P2Pool, un nœud Monero synchronisé utilisant monerod v0.18.0.0 ou
   plus récent est requis. Si vous n'en avez pas actuellement, vous pouvez utiliser
-  mon autre [addon Monerod][monerod] pour HomeAssistant. Ou télécharger les fichiers
+  mon autre [app Monerod][monerod] pour HomeAssistant. Ou télécharger les fichiers
   binaires officiels de Monero, [démarrer monerod sur votre PC][moneronode] et attendre
   qu'il soit entièrement synchronisé.
 - Vous devez utiliser une primary wallet address pour le minage. Les subaddresses
@@ -37,7 +37,7 @@ with a specific repository URL pre-filled.][add-repo-shield]][add-repo]
 
 Je ne suis pas dévellopeur, n'ai aucune formation de code, je suis simplement
 autodidact.
-Si vous avez une question concernant HA et ses add-ons vous pouvez consulter:
+Si vous avez une question concernant HA et ses apps vous pouvez consulter:
 
 - [Le Forum communautaire francophone][hacf] de HomeAssistant
 - [Le Forum communautaire anglophone][forum] de HomeAssistant.
@@ -47,7 +47,7 @@ Si vous avez une question concernant HA et ses add-ons vous pouvez consulter:
 
 MIT License
 
-Copyright (c) 2023-2025 [Frosh][Frosh]
+Copyright (c) 2023-2026 [Frosh][Frosh]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -82,8 +82,8 @@ SOFTWARE.
 > > _3. You should have received a copy of the GNU General Public License
 > > along with this program. If not, see <https://www.gnu.org/licenses>._
 
-[add-addon]: https://my.home-assistant.io/redirect/supervisor_addon/?addon=c751e21a_p2pool
-[add-addon-shield]: https://my.home-assistant.io/badges/supervisor_addon.svg
+[add-app]: https://my.home-assistant.io/redirect/supervisor_addon/?addon=c751e21a_p2pool
+[add-app-shield]: https://my.home-assistant.io/badges/supervisor_addon.svg
 [add-repo]: https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A//github.com/casse-boubou/hassio-addons
 [add-repo-shield]: https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg
 [releases]: https://github.com/casse-boubou/addon-p2pool/releases
