@@ -1,7 +1,5 @@
 {
-  "extends": [
-    "github>casse-boubou/ha-addon-workflows//.github/renovate.json"
-  ],
+  "extends": ["github>casse-boubou/ha-addon-workflows//.github/renovate.json"],
   "customManagers": [
     {
       "customType": "regex",
