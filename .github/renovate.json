@@ -4,7 +4,9 @@
     {
       "customType": "regex",
       "managerFilePatterns": ["//Dockerfile$/"],
-      "matchStrings": ["ARG P2POOL_VERSION=(?<currentValue>.+?)\\s+"],
+      "matchStrings": [
+        "ARG P2POOL_VERSION=(?<currentValue>.+?)\\s+"
+      ],
       "datasourceTemplate": "github-tags",
       "depNameTemplate": "SChernykh/p2pool",
       "versioningTemplate": "loose"
