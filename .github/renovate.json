@@ -1,21 +1,37 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>casse-boubou/ha-addon-workflows//.github/renovate.json"],
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["//Dockerfile$/"],
-      "matchStrings": ["ARG P2POOL_VERSION=(?<currentValue>.+?)\\s+"],
+      "managerFilePatterns": ["/(^|/)Dockerfile$/"],
+      "datasourceTemplate": "repology",
+      "packageNameTemplate": "debian_13/{{package}}",
+      "depNameTemplate": "{{package}}",
+      "matchStrings": [
+        "\\s(?<package>[a-z0-9][a-z0-9-_]+)=(?<currentValue>[a-z0-9-:_+~.]+)\\s"
+      ],
+      "versioningTemplate": "loose"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/)Dockerfile$/"],
       "datasourceTemplate": "github-tags",
-      "depNameTemplate": "SChernykh/p2pool",
+      "packageNameTemplate": "SChernykh/p2pool",
+      "depNameTemplate": "P2Pool",
+      "matchStrings": [
+        "(ARG)\\s(P2POOL.*_VERSION)=\"(?<currentValue>v?[0-9]+\\.[0-9]+(\\.[0-9]+){0,1})\"\\n"
+      ],
       "versioningTemplate": "loose"
     }
   ],
   "packageRules": [
     {
+      "matchManagers": ["custom.regex"],
       "matchDatasources": ["github-tags"],
       "matchDepNames": ["SChernykh/p2pool"],
       "commitMessagePrefix": "✨",
-      "commitMessageTopic": "P2Pool"
+      "commitMessageTopic": "{{depName}}"
     }
   ]
 }

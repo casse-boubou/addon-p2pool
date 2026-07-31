@@ -5,7 +5,7 @@ ARG BUILD_FROM=ghcr.io/hassio-addons/debian-base:9.3.0
 FROM ${BUILD_FROM}
 
 # https://github.com/eikek/sharry/releases
-ARG P2POOL_VERSION=v4.17.1
+ARG P2POOL_VERSION="v4.17.1"
 
 # Add p2pool
 RUN set -eux \
@@ -17,7 +17,8 @@ RUN set -eux \
     tar -xzf /tmp/p2pool.tar.gz -C /tmp; \
     mv /tmp/p2pool-${P2POOL_VERSION}-linux-aarch64/p2pool /opt/p2pool; \
     rm /tmp/p2pool.tar.gz; \
-    rm -r /tmp/p2pool-${P2POOL_VERSION}-linux-aarch64
+    rm -r /tmp/p2pool-${P2POOL_VERSION}-linux-aarch64; \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
     
 COPY --chmod=445 rootfs /
 WORKDIR /
