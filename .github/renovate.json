@@ -1,6 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>casse-boubou/ha-addon-workflows//.github/renovate.json"],
+  "extends": [
+    "github>casse-boubou/ha-addon-workflows//.github/renovate.json",
+    "helpers:pinGitHubActionDigestsToSemver"
+  ],
   "customManagers": [
     {
       "customType": "regex",
