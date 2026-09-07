@@ -1,9 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "github>casse-boubou/ha-addon-workflows//.github/renovate.json",
-    "helpers:pinGitHubActionDigestsToSemver"
-  ],
+  "extends": ["github>casse-boubou/ha-addon-workflows//.github/renovate.json"],
   "customManagers": [
     {
       "customType": "regex",
@@ -30,7 +27,10 @@
   ],
   "packageRules": [
     {
-      "matchDepTypes": ["action"],
+      "matchDepTypes": [
+        "action",
+        "workflow"
+      ],
       "pinDigests": false
     },
     {
